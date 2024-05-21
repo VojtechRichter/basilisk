@@ -10,7 +10,6 @@
 #include <ctype.h>
 
 #define PDF_SIGNATURE 25504446
-#define MAX_FILE_SIZE 1024 * 1024 * 1024 * 5
 
 typedef struct {
     size_t size;
@@ -26,8 +25,6 @@ typedef struct {
 } ProcessedDocument;
 
 
-char **tokenize_document(char *content);
 ProcessedDocument *process_document(const char *file_name);
-
 
 #endif // BASILISK_DOCUMENT_H

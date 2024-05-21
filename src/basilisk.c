@@ -12,8 +12,17 @@ int main(int argc, char **argv)
             file_names[i - 1] = argv[i];
         }
 
-        process_document(file_names[0]);
+        ProcessedDocument *processed_document = process_document(file_names[0]);
 
+        char **tokenized_document = processed_document->content;
+        for (s32 i = 0; i < processed_document->size; i++) {
+            printf("tokenized_document[%d]: %s\n", i, tokenized_document[i]);
+        }
+
+        // jesus christ do smth about this
+        free(processed_document->document);
+        free(processed_document->content);
+        free(processed_document);
         free(file_names);
     } else {
         fprintf(stderr, "No document provided.\n");

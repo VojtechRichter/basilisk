@@ -1,9 +1,6 @@
 #include "document.h"
 
-char **tokenize_document(char *content)
-{
-    return (char **)0;
-}
+#define PHRASE_DELIM " \r\n"
 
 ProcessedDocument *process_document(const char *file_name)
 {
@@ -11,7 +8,7 @@ ProcessedDocument *process_document(const char *file_name)
     errno_t fopen_errno = fopen_s(&fp, file_name, "rb");
     if (fp == NULL) {
         fprintf(stderr, "Error occured: %s\n", strerror(fopen_errno));
-        exit(0);
+        exit(1);
     }
 
     fseek(fp, 0, SEEK_END);
@@ -22,7 +19,7 @@ ProcessedDocument *process_document(const char *file_name)
     if (content_buf == NULL) {
         perror("Failed to allocate file content buffer");
         fclose(fp);
-        exit(0);
+        exit(1);
     }
 
     size_t bytes_read = fread(content_buf, sizeof(char), file_size, fp);
@@ -30,36 +27,39 @@ ProcessedDocument *process_document(const char *file_name)
         perror("Bytes read and file size don't match");
         free(content_buf);
         fclose(fp);
-        exit(0);
+        exit(1);
     }
 
     content_buf[file_size] = '\0';
 
-    // content_buf has all the content, so something below is not reading everything
+    char **tokens = (char **)malloc(sizeof(char *) * file_size);
+    BASILISK_ASSERT(tokens != NULL);
 
-    // TODO: read the file signature
-    Document *document = (Document *)malloc(sizeof(Document));
-    document->size = file_size;
-    document->file_type = 0;
-    document->file_name = file_name;
-    document->id = file_name;
-
-    // depends on the file type
-    char *phrase = strtok(content_buf, " ,.\n");
-
-    char **tokens = (char **)malloc(file_size);
+    char *phrase = strtok(content_buf, PHRASE_DELIM);
     tokens[0] = phrase;
     s32 phrase_idx = 1;
 
     while (phrase != NULL) {
         tokens[phrase_idx] = phrase;
         phrase_idx++;
+
+        phrase = strtok(NULL, PHRASE_DELIM);
     }
 
     free(content_buf);
     fclose(fp);
 
-    free(tokens);
+    ProcessedDocument *processed_doc = malloc(sizeof(ProcessedDocument));
 
-    return NULL;
+    Document *document = malloc(sizeof(Document));
+    document->size = file_size;
+    document->file_type = 0;
+    document->file_name = file_name;
+    document->id = file_name;
+
+    processed_doc->document = document;
+    processed_doc->content = tokens;
+    processed_doc->size = phrase_idx;
+
+    return processed_doc;
 }
