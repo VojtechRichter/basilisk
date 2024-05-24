@@ -24,7 +24,9 @@ typedef struct {
     size_t size;
 } ProcessedDocument;
 
-
 ProcessedDocument *process_document(const char *file_name);
+void release_processed_doc(ProcessedDocument *doc);
+ProcessedDocument **parse_documents(char **file_names, s16 count);
+
 
 #endif // BASILISK_DOCUMENT_H
