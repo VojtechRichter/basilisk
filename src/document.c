@@ -32,8 +32,7 @@ ProcessedDocument *process_document(const char *file_name)
 
     content_buf[file_size] = '\0';
 
-    // estimate the file size to a half or so
-    char **tokens = (char **)malloc(sizeof(char *) * file_size);
+    char **tokens = (char **)malloc(sizeof(char *) * (file_size / 2));
 
     char *phrase = strtok(content_buf, PHRASE_DELIM);
 
@@ -57,6 +56,7 @@ ProcessedDocument *process_document(const char *file_name)
 
     Document *document = malloc(sizeof(Document));
     document->size = file_size;
+    // TODO: infer from file signature
     document->file_type = 0;
     document->file_name = file_name;
     document->id = file_name;
